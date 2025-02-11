@@ -10,7 +10,16 @@ const loadDataFromLocalStorage = () => {
     const themeColor = localStorage.getItem("themeColor");
     document.body.classList.toggle("light-mode", themeColor === "light_mode");
     themeButton.innerText = document.body.classList.contains("light-mode") ? "dark_mode" : "light_mode";
-    chatContainer.innerHTML = localStorage.getItem("all-chats") || "";
+
+    const defaultText = `<div class="default-text">
+                            <h1>DevsAI | Web3bridge</h1>
+                            <p>Start a conversation and explore the power of AI.<br> Your chat history will be displayed here.</p>
+                            </div>`
+    chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
+
+
+    
+
 };
 
 // Create chat message element
@@ -61,7 +70,7 @@ const handleOutgoingChat = () => {
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
     
     setTimeout(() => {
-        const incomingChatHtml = `<div class="chat-content"><div class="chat-details"><img src="images/chatbox.jpg" alt="chatbot-img"><div class="chatbox-animation"><div class="dotted-txt"></div><div class="dotted-txt"></div><div class="dotted-txt"></div></div></div><span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span></div>`;
+        const incomingChatHtml = `<div class="chat-content"><div class="chat-details"><img src="images/chatbot.jpg" alt="chatbot-img"><div class="chatbox-animation"><div class="dotted-txt"></div><div class="dotted-txt"></div><div class="dotted-txt"></div></div></div><span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span></div>`;
         const incomingChatDiv = createChatElement(incomingChatHtml, "chatbot-msg");
         chatContainer.appendChild(incomingChatDiv);
         chatContainer.scrollTo(0, chatContainer.scrollHeight);
