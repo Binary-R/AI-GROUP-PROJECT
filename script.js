@@ -3,7 +3,7 @@ const chatInput = document.querySelector("#txt-input");
 const sendButton = document.querySelector(".text-box span");
 const themeButton = document.querySelector("#theme-btn");
 const deleteButton = document.querySelector("#delete-btn");
-const API_KEY = "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";
+const API_KEY = ""; // Ensure this is kept secure!
 
 // Load chat history and theme from local storage
 const loadDataFromLocalStorage = () => {
@@ -14,12 +14,8 @@ const loadDataFromLocalStorage = () => {
     const defaultText = `<div class="default-text">
                             <h1>DevsAI | Web3bridge</h1>
                             <p>Start a conversation and explore the power of AI.<br> Your chat history will be displayed here.</p>
-                            </div>`
+                         </div>`;
     chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
-
-
-    
-
 };
 
 // Create chat message element
@@ -31,26 +27,26 @@ const createChatElement = (content, className) => {
 };
 
 // Fetch chatbot response
-const getChatResponse = async (incomingChatDiv) => {
+const getChatResponse = async (incomingChatDiv, userInput) => {
     try {
-        const response = await fetch("https://api.openai.com/v1/completions", {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${API_KEY}`
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "text-davinci-003",
-                prompt: chatInput.value.trim(),
-                max_tokens: 2048,
-                temperature: 0.7,
-                n: 1
+                contents: [{ role: "user", parts: [{ text: userInput }] }]
             })
         });
+
         const data = await response.json();
-        const responseText = data.choices?.[0]?.text.trim() || "Error: No response";
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error: No response received";
+
+        // Remove typing animation
         incomingChatDiv.querySelector(".chatbox-animation").remove();
         incomingChatDiv.querySelector(".chat-details").innerHTML += `<p>${responseText}</p>`;
+
+        // Save chat history
         localStorage.setItem("all-chats", chatContainer.innerHTML);
         chatContainer.scrollTo(0, chatContainer.scrollHeight);
     } catch (error) {
@@ -64,17 +60,32 @@ const handleOutgoingChat = () => {
     const userText = chatInput.value.trim();
     if (!userText) return;
     chatInput.value = "";
+
+    // Append user message
     const outgoingChatHtml = `<div class="chat-content"><div class="chat-details"><img src="images/user.jpg" alt="user-img"><p>${userText}</p></div></div>`;
     const outgoingChatDiv = createChatElement(outgoingChatHtml, "user-msg");
     chatContainer.appendChild(outgoingChatDiv);
     chatContainer.scrollTo(0, chatContainer.scrollHeight);
-    
+
+    // Append chatbot typing animation
     setTimeout(() => {
-        const incomingChatHtml = `<div class="chat-content"><div class="chat-details"><img src="images/chatbot.jpg" alt="chatbot-img"><div class="chatbox-animation"><div class="dotted-txt"></div><div class="dotted-txt"></div><div class="dotted-txt"></div></div></div><span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span></div>`;
+        const incomingChatHtml = `<div class="chat-content">
+                                    <div class="chat-details">
+                                        <img src="images/chatbot.jpg" alt="chatbot-img">
+                                        <div class="chatbox-animation">
+                                            <div class="dotted-txt"></div>
+                                            <div class="dotted-txt"></div>
+                                            <div class="dotted-txt"></div>
+                                        </div>
+                                    </div>
+                                    <span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span>
+                                  </div>`;
         const incomingChatDiv = createChatElement(incomingChatHtml, "chatbot-msg");
         chatContainer.appendChild(incomingChatDiv);
         chatContainer.scrollTo(0, chatContainer.scrollHeight);
-        getChatResponse(incomingChatDiv);
+
+        // Fetch chatbot response
+        getChatResponse(incomingChatDiv, userText);
     }, 500);
 };
 
