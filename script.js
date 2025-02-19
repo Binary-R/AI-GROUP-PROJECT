@@ -3,7 +3,7 @@ const chatInput = document.querySelector("#txt-input");
 const sendButton = document.querySelector(".text-box span");
 const themeButton = document.querySelector("#theme-btn");
 const deleteButton = document.querySelector("#delete-btn");
-const API_KEY = ""; // Ensure this is kept secure!
+const API_KEY = "AIzaSyBP3Z9OE0hRo0oTyZ_0jOztkXoNyu1ZHgM"; // Ensure this is kept secure!
 
 // Load chat history and theme from local storage
 const loadDataFromLocalStorage = () => {
